@@ -1,0 +1,8 @@
+{
+  "Records": [
+    {
+      "messageId": "example-1",
+      "body": "{\"provider\": \"planetiq\", \"date\": \"2026-10-04\", \"url\": \"https://data.cosmic.ucar.edu/gnss-ro/planetiq/noaa/nrt/level2/2026/277/\", \"jobId\": \"job-demo\"}"
+    }
+  ]
+}

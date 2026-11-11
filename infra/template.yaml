@@ -1,0 +1,529 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  GNSS Interference Watch (Northwestern CS 310). Daily UCAR radio-occultation
+  ingest, density-ratio anomaly detection, GPSJam cross-check, and a REST API
+  for the Leaflet map. Skeleton defaults to stub mode: Lambdas return the
+  contract shapes and do not call UCAR, GPSJam, or Bedrock.
+
+  Paths below are relative to this file (infra/). From the repo root:
+    sam build -t infra/template.yaml
+    sam deploy -t infra/template.yaml --guided
+
+Parameters:
+  StubMode:
+    Type: String
+    Default: "1"
+    AllowedValues: ["0", "1"]
+    Description: >
+      1 (default) keeps every Lambda in stub mode. Set to 0 only after that
+      function's TODO calls to AWS and the public data hosts are implemented.
+  IngestScheduleExpression:
+    Type: String
+    Default: "cron(0 12 * * ? *)"
+    Description: When the Planner runs, UTC. Default is 12:00 UTC daily.
+  AnalysisScheduleExpression:
+    Type: String
+    Default: "cron(30 13 * * ? *)"
+    Description: >
+      When Step Functions runs Detect then Cross-check, UTC. Default is
+      13:30 UTC, after the morning ingest has had time to drain.
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: >
+      Optional address subscribed to the alert topic at deploy time. Leave
+      empty to skip; subscribers can also be added through POST /subscriptions.
+      AWS emails a confirmation link that must be accepted.
+
+Conditions:
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Handler: handler.handler
+    Timeout: 60
+    MemorySize: 256
+    Environment:
+      Variables:
+        GNSSIW_STUB: !Ref StubMode
+        Z_WINDOW_DAYS: "30"
+        ENABLE_BEDROCK: "0"
+        QUEUE_URL: !Ref IngestQueue
+        PROFILES_BUCKET: !Ref ProfilesBucket
+        WEBSITE_BUCKET: !Ref WebsiteBucket
+        ALERT_TOPIC_ARN: !Ref AlertTopic
+        REGIONS_TABLE: !Ref RegionsTable
+        DAILY_COUNTS_TABLE: !Ref DailyCountsTable
+        ANOMALIES_TABLE: !Ref AnomaliesTable
+        JOBS_TABLE: !Ref JobsTable
+        SUBSCRIPTIONS_TABLE: !Ref SubscriptionsTable
+
+Resources:
+  ProfilesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # Cleaned profiles: profiles/provider=.../date=.../part-0.parquet
+      # GPSJam cache:    gpsjam/date=.../h3_4.csv
+
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      # TODO(Alert & Show): host alert-show/web here (static website or
+      # CloudFront) once the demo should be public. The bucket stays private
+      # until that step so a first deploy does not publish the page.
+
+  RegionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-regions"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: regionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: regionId
+          KeyType: HASH
+
+  DailyCountsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-daily-counts"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: date
+          KeyType: RANGE
+
+  AnomaliesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-anomalies"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: date
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: date
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+  JobsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-jobs"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: jobId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: jobId
+          KeyType: HASH
+
+  SubscriptionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-subscriptions"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: subscriptionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: subscriptionId
+          KeyType: HASH
+
+  IngestDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-ingest-dlq"
+      MessageRetentionPeriod: 1209600
+
+  IngestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-ingest"
+      # Must exceed the Reader timeout so a running decode is not delivered twice.
+      VisibilityTimeout: 900
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IngestDLQ.Arn
+        maxReceiveCount: 3
+
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AWS::StackName}-alerts"
+
+  AlertTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref AlertTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudWatchAlarms
+            Effect: Allow
+            Principal:
+              Service: cloudwatch.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref AlertTopic
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub "arn:${AWS::Partition}:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:*"
+
+  AlertEmailSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties:
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+      TopicArn: !Ref AlertTopic
+
+  DlqAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-ingest-dlq"
+      AlarmDescription: Ingest messages landed in the dead-letter queue.
+      Namespace: AWS/SQS
+      MetricName: ApproximateNumberOfMessagesVisible
+      Dimensions:
+        - Name: QueueName
+          Value: !GetAtt IngestDLQ.QueueName
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref AlertTopic
+
+  PlannerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-planner"
+      CodeUri: ../collect/planner/
+      Description: Lists the day's UCAR level-2 files and enqueues one ticket per file.
+      Timeout: 120
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt IngestQueue.QueueName
+      Events:
+        Daily:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref IngestScheduleExpression
+            Description: Start the daily UCAR ingest.
+            Input: '{"source":"eventbridge"}'
+    Metadata:
+      BuildMethod: makefile
+
+  ReaderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-reader"
+      CodeUri: ../collect/reader/
+      Description: Downloads one UCAR file, tags profiles by region, writes Parquet and DailyCounts.
+      Timeout: 300
+      MemorySize: 1024
+      EphemeralStorage:
+        Size: 2048
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt IngestQueue.QueueName
+        - S3CrudPolicy:
+            BucketName: !Ref ProfilesBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DailyCountsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+      Events:
+        Ingest:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt IngestQueue.Arn
+            BatchSize: 1
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+    Metadata:
+      BuildMethod: makefile
+
+  DetectorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-detector"
+      CodeUri: ../detect/detector/
+      Description: Scores each region and provider with a density ratio and a rolling z-score.
+      Timeout: 120
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DailyCountsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnomaliesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RegionsTable
+    Metadata:
+      BuildMethod: makefile
+
+  RequestHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-api"
+      CodeUri: ../detect/request_handler/
+      Description: REST API for regions, timeseries, and backfill jobs.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RegionsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DailyCountsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnomaliesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref JobsTable
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt IngestQueue.QueueName
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource: !GetAtt PlannerFunction.Arn
+      Events:
+        GetRegions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /regions
+            Method: GET
+        PostRegions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /regions
+            Method: POST
+        GetTimeseries:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /regions/{id}/timeseries
+            Method: GET
+        PostAnalyses:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /analyses
+            Method: POST
+        GetAnalysis:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /analyses/{id}
+            Method: GET
+    Metadata:
+      BuildMethod: makefile
+
+  CrossCheckerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-cross-checker"
+      CodeUri: ../alert-show/cross_checker/
+      Description: Fuses flagged regions with GPSJam and publishes high-risk alerts.
+      Timeout: 120
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnomaliesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SubscriptionsTable
+        - S3CrudPolicy:
+            BucketName: !Ref ProfilesBucket
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertTopic.TopicName
+    Metadata:
+      BuildMethod: makefile
+
+  AlertApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-alert-api"
+      CodeUri: ../alert-show/api_handler/
+      Description: REST API for hotspots and email subscriptions.
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AnomaliesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SubscriptionsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RegionsTable
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:Subscribe
+                - sns:SetSubscriptionAttributes
+              Resource: !Ref AlertTopic
+      Events:
+        GetHotspots:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /hotspots
+            Method: GET
+        PostSubscriptions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /subscriptions
+            Method: POST
+    Metadata:
+      BuildMethod: makefile
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}"
+      StageName: Prod
+      Cors:
+        AllowOrigin: "'*'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+
+  AnalysisStateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: invoke-analysis-lambdas
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource:
+                  - !GetAtt DetectorFunction.Arn
+                  - !GetAtt CrossCheckerFunction.Arn
+
+  AnalysisStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-daily-analysis"
+      Type: STANDARD
+      Role: !GetAtt AnalysisStateMachineRole.Arn
+      Definition:
+        Comment: Score yesterday's counts, then fuse the flagged rows with GPSJam.
+        StartAt: Detect
+        States:
+          Detect:
+            Type: Task
+            Resource: !GetAtt DetectorFunction.Arn
+            Next: CrossCheck
+            Retry:
+              - ErrorEquals:
+                  - States.TaskFailed
+                  - Lambda.TooManyRequestsException
+                  - Lambda.ServiceException
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                IntervalSeconds: 2
+                MaxAttempts: 2
+                BackoffRate: 2
+          CrossCheck:
+            Type: Task
+            Resource: !GetAtt CrossCheckerFunction.Arn
+            End: true
+            Retry:
+              - ErrorEquals:
+                  - States.TaskFailed
+                  - Lambda.TooManyRequestsException
+                  - Lambda.ServiceException
+                  - Lambda.AWSLambdaException
+                  - Lambda.SdkClientException
+                IntervalSeconds: 2
+                MaxAttempts: 2
+                BackoffRate: 2
+
+  # Role ARN is built from the name so this role and the state machine do not
+  # form a reference cycle. The rule DependsOn the state machine below.
+  AnalysisScheduleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: start-analysis
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: states:StartExecution
+                Resource: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-daily-analysis"
+
+  AnalysisSchedule:
+    Type: AWS::Events::Rule
+    DependsOn: AnalysisStateMachine
+    Properties:
+      Name: !Sub "${AWS::StackName}-daily-analysis"
+      Description: Run Detect, then Cross-check, after the daily ingest.
+      ScheduleExpression: !Ref AnalysisScheduleExpression
+      State: ENABLED
+      Targets:
+        - Id: AnalysisStateMachine
+          Arn: !Sub "arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${AWS::StackName}-daily-analysis"
+          RoleArn: !GetAtt AnalysisScheduleRole.Arn
+          Input: '{"source":"schedule"}'
+
+Outputs:
+  ApiBaseUrl:
+    Description: REST API base URL. Paste it into alert-show/web/index.html as GNSSIW_API_BASE.
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  IngestQueueUrl:
+    Value: !Ref IngestQueue
+  IngestDlqUrl:
+    Value: !Ref IngestDLQ
+  ProfilesBucketName:
+    Value: !Ref ProfilesBucket
+  WebsiteBucketName:
+    Value: !Ref WebsiteBucket
+  AlertTopicArn:
+    Value: !Ref AlertTopic
+  AnalysisStateMachineArn:
+    Value: !Ref AnalysisStateMachine

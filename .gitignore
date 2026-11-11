@@ -1,0 +1,15 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.aws-sam/
+samconfig.toml
+.env
+.idea/
+.vscode/
+.DS_Store
+*.zip
+dist/
+*.egg-info/

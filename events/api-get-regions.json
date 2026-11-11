@@ -1,0 +1,8 @@
+{
+  "httpMethod": "GET",
+  "resource": "/regions",
+  "path": "/regions",
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "body": null
+}
