@@ -1,0 +1,5 @@
+{
+  "date": "2026-10-04",
+  "providers": ["planetiq", "spire", "cosmic2"],
+  "jobId": "job-demo"
+}

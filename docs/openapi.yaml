@@ -1,0 +1,427 @@
+openapi: 3.0.3
+info:
+  title: GNSS Interference Watch API
+  version: 0.1.0
+  description: >
+    REST API for the CS 310 GNSS Interference Watch service. Detect owns
+    regions, timeseries, and backfill jobs. Alert & Show owns hotspots and
+    subscriptions. Shapes here are the contract in docs/data-contracts.md.
+    The SAM routes in infra/template.yaml must list the same paths and verbs;
+    tests/test_contracts.py checks that.
+servers:
+  - url: https://{apiId}.execute-api.{region}.amazonaws.com/Prod
+    variables:
+      apiId:
+        default: example
+      region:
+        default: us-east-1
+tags:
+  - name: Detect
+    description: Part 2. Regions, timeseries, and analysis jobs.
+  - name: Alert
+    description: Part 3. Hotspots and email subscriptions.
+paths:
+  /regions:
+    get:
+      tags: [Detect]
+      operationId: listRegions
+      summary: List watched regions.
+      responses:
+        "200":
+          description: The region list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [regions]
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Region"
+    post:
+      tags: [Detect]
+      operationId: createRegion
+      summary: Create a custom region.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewRegion"
+      responses:
+        "201":
+          description: The created region.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Region"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /regions/{id}/timeseries:
+    get:
+      tags: [Detect]
+      operationId: getRegionTimeseries
+      summary: Daily counts, expected counts, ratios, and z-scores for one region.
+      parameters:
+        - $ref: "#/components/parameters/RegionId"
+        - $ref: "#/components/parameters/Provider"
+        - $ref: "#/components/parameters/FromDate"
+        - $ref: "#/components/parameters/ToDate"
+      responses:
+        "200":
+          description: One point per day in the range. Points are empty until DailyCounts is wired.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Timeseries"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /hotspots:
+    get:
+      tags: [Alert]
+      operationId: listHotspots
+      summary: Regions flagged on a day, with GPSJam overlap and risk.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: UTC day. Defaults to yesterday, the latest closed day.
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Flagged rows for that day.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [date, hotspots]
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  hotspots:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Hotspot"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /analyses:
+    post:
+      tags: [Detect]
+      operationId: startAnalysis
+      summary: Backfill a date range. Work continues on the ingest queue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewAnalysis"
+      responses:
+        "202":
+          description: The job was accepted and is queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          description: An overlapping queued or running job already exists.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Error"
+                  - type: object
+                    required: [jobId]
+                    properties:
+                      jobId:
+                        type: string
+  /analyses/{id}:
+    get:
+      tags: [Detect]
+      operationId: getAnalysis
+      summary: Progress of one backfill job.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current job status.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisJob"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /subscriptions:
+    post:
+      tags: [Alert]
+      operationId: createSubscription
+      summary: Subscribe an email. SNS sends the confirmation message.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewSubscription"
+      responses:
+        "201":
+          description: The subscription row. confirmed is false until the SNS link is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+components:
+  parameters:
+    RegionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: baltic
+    Provider:
+      name: provider
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [planetiq, spire, cosmic2]
+    FromDate:
+      name: from
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+    ToDate:
+      name: to
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+  responses:
+    BadRequest:
+      description: The date, box, provider, email, or range is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: No region or job has that id.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+    Region:
+      type: object
+      required: [id, name, minLat, maxLat, minLon, maxLon, type, areaKm2]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        minLat:
+          type: number
+        maxLat:
+          type: number
+        minLon:
+          type: number
+        maxLon:
+          type: number
+        type:
+          type: string
+          enum: [hotspot, control, custom]
+        areaKm2:
+          type: number
+    NewRegion:
+      type: object
+      required: [name, minLat, maxLat, minLon, maxLon]
+      properties:
+        name:
+          type: string
+        minLat:
+          type: number
+        maxLat:
+          type: number
+        minLon:
+          type: number
+        maxLon:
+          type: number
+    TimeseriesPoint:
+      type: object
+      required: [date, count, expected, ratio, z]
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+        expected:
+          type: number
+        ratio:
+          type: number
+          description: count / expected. 1.0 is a normal day.
+        z:
+          type: number
+          nullable: true
+          description: Rolling sample z-score. Null when the trailing window is shorter than 7 days.
+    Timeseries:
+      type: object
+      required: [regionId, provider, from, to, points]
+      properties:
+        regionId:
+          type: string
+        provider:
+          type: string
+          enum: [planetiq, spire, cosmic2]
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        points:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeseriesPoint"
+    Hotspot:
+      type: object
+      required: [date, regionId, provider, ratio, z, gpsjamOverlap, risk]
+      properties:
+        date:
+          type: string
+          format: date
+        regionId:
+          type: string
+        provider:
+          type: string
+          enum: [planetiq, spire, cosmic2]
+        ratio:
+          type: number
+        z:
+          type: number
+          nullable: true
+        gpsjamOverlap:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of the region's GPSJam cells marked high.
+        correlation:
+          type: number
+          nullable: true
+        risk:
+          type: string
+          enum: [Low, Medium, High]
+        summary:
+          type: string
+    NewAnalysis:
+      type: object
+      required: [from, to]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        providers:
+          type: array
+          items:
+            type: string
+            enum: [planetiq, spire, cosmic2]
+          description: Defaults to all three providers.
+    AnalysisAccepted:
+      type: object
+      required: [jobId, status, from, to, providers, filesDone, filesTotal]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum: [queued]
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        providers:
+          type: array
+          items:
+            type: string
+        filesDone:
+          type: integer
+        filesTotal:
+          type: integer
+    AnalysisJob:
+      type: object
+      required: [jobId, status, from, to, filesDone, filesTotal]
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum: [queued, running, done, failed]
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        filesDone:
+          type: integer
+        filesTotal:
+          type: integer
+    NewSubscription:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        regionIds:
+          type: array
+          items:
+            type: string
+          description: Defaults to every seed region.
+        minRisk:
+          type: string
+          enum: [Low, Medium, High]
+          default: High
+    Subscription:
+      type: object
+      required: [subscriptionId, email, regionIds, minRisk, confirmed]
+      properties:
+        subscriptionId:
+          type: string
+        email:
+          type: string
+        regionIds:
+          type: array
+          items:
+            type: string
+        minRisk:
+          type: string
+          enum: [Low, Medium, High]
+        confirmed:
+          type: boolean

@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 830" width="1500" height="830" font-family="Helvetica, Arial, sans-serif">
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#232F3E"/></marker>
+<marker id="arS" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#232F3E"/></marker>
+<style>
+.svc{font-size:11px;font-weight:700;fill:#fff;text-anchor:middle;letter-spacing:.5px}
+.ttl{font-size:15px;font-weight:700;fill:#16191F;text-anchor:middle}
+.sub{font-size:12px;fill:#414D5C;text-anchor:middle}
+.lbl{font-size:12px;fill:#232F3E;font-style:italic}
+.tiny{font-size:11px;fill:#7a2050;font-style:italic}
+.bdg{font-size:12px;font-weight:700;fill:#fff;text-anchor:middle}
+.zone{font-size:13px;font-weight:700;fill:#fff;text-anchor:middle}
+.zonel{font-size:13px;font-weight:700;fill:#5A6B7B}
+.zonel2{font-size:13px;font-weight:700;fill:#8C4FFF}
+.grp{font-size:12px;font-weight:700;fill:#B0084D}
+</style></defs>
+<rect width="1500" height="830" fill="#fff"/>
+<rect x="250" y="122" width="1235" height="698" rx="12" fill="#F7F9FB" stroke="#232F3E" stroke-width="1.5"/>
+<rect x="250" y="122" width="150" height="26" rx="6" fill="#232F3E"/><text x="325" y="140" class="zone">AWS Cloud</text>
+<text x="20" y="30" class="zonel"></text>
+<rect x="1065" y="146" width="405" height="128" rx="10" fill="#FDEFF6" stroke="#E7157B" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="1077" y="163" class="grp" text-anchor="start">STEP FUNCTIONS: daily analysis, in order</text>
+<text x="270" y="582" class="zonel2" text-anchor="start">How people use it (website + API)</text>
+<line x1="262" y1="590" x2="760" y2="590" stroke="#8C4FFF" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="20" y="24" class="zonel" style="fill:#232F3E">Three parts (one per teammate)</text>
+<rect x="20" y="36" width="26" height="16" rx="4" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/><text x="54" y="49" class="ttl" style="text-anchor:start;font-size:14px">Part 1 · Collect</text>
+<rect x="20" y="58" width="26" height="16" rx="4" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/><text x="54" y="71" class="ttl" style="text-anchor:start;font-size:14px">Part 2 · Detect</text>
+<rect x="20" y="80" width="26" height="16" rx="4" fill="#CDEFD6" stroke="#3BA55C" stroke-width="2"/><text x="54" y="93" class="ttl" style="text-anchor:start;font-size:14px">Part 3 · Alert & Show</text>
+<text x="235" y="49" class="tiny" style="fill:#414D5C;text-anchor:start">1-7 = daily steps</text>
+<text x="235" y="67" class="tiny" style="fill:#414D5C;text-anchor:start">A, B = when someone uses the site</text>
+<text x="235" y="85" class="tiny" style="fill:#414D5C;text-anchor:start">Dashed box = optional / stretch</text>
+<text x="235" y="103" class="tiny" style="fill:#414D5C;text-anchor:start">Box header = AWS service name</text>
+<rect x="560" y="40" width="400" height="62" rx="8" fill="#fff" stroke="#5A6B7B" stroke-width="2"/>
+<rect x="560" y="40" width="400" height="22" rx="8" fill="#5A6B7B"/><rect x="560" y="52" width="400" height="10" fill="#5A6B7B"/>
+<text x="760.0" y="56" class="svc">PUBLIC WEBSITE</text>
+<text x="760.0" y="82" class="ttl">UCAR satellite data archive</text>
+<text x="760.0" y="99" class="sub">new GPS-satellite measurement files every day</text>
+<rect x="1290" y="40" width="180" height="62" rx="8" fill="#fff" stroke="#5A6B7B" stroke-width="2"/>
+<rect x="1290" y="40" width="180" height="22" rx="8" fill="#5A6B7B"/><rect x="1290" y="52" width="180" height="10" fill="#5A6B7B"/>
+<text x="1380.0" y="56" class="svc">PUBLIC WEBSITE</text>
+<text x="1380.0" y="82" class="ttl">GPSJam.org</text>
+<text x="1380.0" y="99" class="sub">map of airplane GPS trouble</text>
+<rect x="11" y="631" width="228" height="98" rx="12" fill="#CDEFD6" stroke="#3BA55C" stroke-width="2"/>
+<rect x="20" y="640" width="210" height="80" rx="8" fill="#fff" stroke="#5A6B7B" stroke-width="2"/>
+<rect x="20" y="640" width="210" height="22" rx="8" fill="#5A6B7B"/><rect x="20" y="652" width="210" height="10" fill="#5A6B7B"/>
+<text x="125.0" y="656" class="svc">DEMO WEBSITE</text>
+<text x="125.0" y="682" class="ttl">Interactive map</text>
+<text x="125.0" y="699" class="sub">colors show trouble spots</text>
+<text x="125.0" y="714" class="sub">slider picks the date</text>
+<rect x="271" y="171" width="168" height="98" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="280" y="180" width="150" height="80" rx="8" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="280" y="180" width="150" height="22" rx="8" fill="#E7157B"/><rect x="280" y="192" width="150" height="10" fill="#E7157B"/>
+<text x="355.0" y="196" class="svc">EVENTBRIDGE</text>
+<text x="355.0" y="222" class="ttl">Alarm clock</text>
+<text x="355.0" y="239" class="sub">starts the job</text>
+<text x="355.0" y="254" class="sub">once a day</text>
+<circle cx="426" cy="176" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="426" y="181" class="bdg">1</text>
+<rect x="471" y="171" width="168" height="98" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="480" y="180" width="150" height="80" rx="8" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="480" y="180" width="150" height="22" rx="8" fill="#ED7100"/><rect x="480" y="192" width="150" height="10" fill="#ED7100"/>
+<text x="555.0" y="196" class="svc">LAMBDA</text>
+<text x="555.0" y="222" class="ttl">Planner</text>
+<text x="555.0" y="239" class="sub">makes the day's</text>
+<text x="555.0" y="254" class="sub">to-do list of files</text>
+<circle cx="626" cy="176" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="626" y="181" class="bdg">2</text>
+<rect x="671" y="171" width="168" height="98" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="680" y="180" width="150" height="80" rx="8" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="680" y="180" width="150" height="22" rx="8" fill="#E7157B"/><rect x="680" y="192" width="150" height="10" fill="#E7157B"/>
+<text x="755.0" y="196" class="svc">SQS QUEUE</text>
+<text x="755.0" y="222" class="ttl">To-do line</text>
+<text x="755.0" y="239" class="sub">one ticket per file</text>
+<rect x="871" y="171" width="168" height="98" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="880" y="180" width="150" height="80" rx="8" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="880" y="180" width="150" height="22" rx="8" fill="#ED7100"/><rect x="880" y="192" width="150" height="10" fill="#ED7100"/>
+<text x="955.0" y="196" class="svc">LAMBDA</text>
+<text x="955.0" y="222" class="ttl">Reader</text>
+<text x="955.0" y="239" class="sub">downloads and opens</text>
+<text x="955.0" y="254" class="sub">each file; tags region</text>
+<circle cx="1026" cy="176" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1026" y="181" class="bdg">3</text>
+<rect x="1071" y="177" width="168" height="94" rx="12" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/>
+<rect x="1080" y="186" width="150" height="76" rx="8" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="1080" y="186" width="150" height="22" rx="8" fill="#ED7100"/><rect x="1080" y="198" width="150" height="10" fill="#ED7100"/>
+<text x="1155.0" y="202" class="svc">LAMBDA</text>
+<text x="1155.0" y="228" class="ttl">Detector</text>
+<text x="1155.0" y="245" class="sub">finds regions with</text>
+<text x="1155.0" y="260" class="sub">missing measurements</text>
+<circle cx="1226" cy="182" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1226" y="187" class="bdg">5</text>
+<rect x="1291" y="177" width="173" height="94" rx="12" fill="#CDEFD6" stroke="#3BA55C" stroke-width="2"/>
+<rect x="1300" y="186" width="155" height="76" rx="8" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="1300" y="186" width="155" height="22" rx="8" fill="#ED7100"/><rect x="1300" y="198" width="155" height="10" fill="#ED7100"/>
+<text x="1377.5" y="202" class="svc">LAMBDA</text>
+<text x="1377.5" y="228" class="ttl">Cross-checker</text>
+<text x="1377.5" y="245" class="sub">compares with GPSJam,</text>
+<text x="1377.5" y="260" class="sub">gives a risk score</text>
+<circle cx="1451" cy="182" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1451" y="187" class="bdg">6</text>
+<rect x="471" y="311" width="168" height="80" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="480" y="320" width="150" height="62" rx="8" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="480" y="320" width="150" height="22" rx="8" fill="#E7157B"/><rect x="480" y="332" width="150" height="10" fill="#E7157B"/>
+<text x="555.0" y="336" class="svc">SQS QUEUE</text>
+<text x="555.0" y="362" class="ttl">Problem pile</text>
+<text x="555.0" y="379" class="sub">files that kept failing</text>
+<rect x="871" y="411" width="168" height="118" rx="12" fill="#D3E9FF" stroke="#3D8BD9" stroke-width="2"/>
+<rect x="880" y="420" width="150" height="100" rx="8" fill="#fff" stroke="#3F8624" stroke-width="2"/>
+<rect x="880" y="420" width="150" height="22" rx="8" fill="#3F8624"/><rect x="880" y="432" width="150" height="10" fill="#3F8624"/>
+<text x="955.0" y="436" class="svc">S3</text>
+<text x="955.0" y="462" class="ttl">File storage</text>
+<text x="955.0" y="479" class="sub">cleaned-up data files</text>
+<text x="955.0" y="494" class="sub">+ the demo website</text>
+<circle cx="1026" cy="416" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1026" y="421" class="bdg">4</text>
+<rect x="1071" y="411" width="208" height="118" rx="12" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/>
+<rect x="1080" y="420" width="190" height="100" rx="8" fill="#fff" stroke="#4053D6" stroke-width="2"/>
+<rect x="1080" y="420" width="190" height="22" rx="8" fill="#4053D6"/><rect x="1080" y="432" width="190" height="10" fill="#4053D6"/>
+<text x="1175.0" y="436" class="svc">DYNAMODB</text>
+<text x="1175.0" y="462" class="ttl">Database</text>
+<text x="1175.0" y="479" class="sub">daily counts, alerts,</text>
+<text x="1175.0" y="494" class="sub">regions, jobs,</text>
+<text x="1175.0" y="509" class="sub">subscribers</text>
+<circle cx="1266" cy="416" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1266" y="421" class="bdg">4</text>
+<rect x="1321" y="306" width="158" height="84" rx="12" fill="#CDEFD6" stroke="#3BA55C" stroke-width="2"/>
+<rect x="1330" y="315" width="140" height="66" rx="8" fill="#fff" stroke="#01A88D" stroke-width="2" stroke-dasharray="7 5"/>
+<rect x="1330" y="315" width="140" height="22" rx="8" fill="#01A88D"/><rect x="1330" y="327" width="140" height="10" fill="#01A88D"/>
+<text x="1400.0" y="331" class="svc">BEDROCK (OPTIONAL)</text>
+<text x="1400.0" y="357" class="ttl">AI writer</text>
+<text x="1400.0" y="374" class="sub">writes a short summary</text>
+<rect x="1301" y="411" width="178" height="98" rx="12" fill="#CDEFD6" stroke="#3BA55C" stroke-width="2"/>
+<rect x="1310" y="420" width="160" height="80" rx="8" fill="#fff" stroke="#E7157B" stroke-width="2"/>
+<rect x="1310" y="420" width="160" height="22" rx="8" fill="#E7157B"/><rect x="1310" y="432" width="160" height="10" fill="#E7157B"/>
+<text x="1390.0" y="436" class="svc">SNS</text>
+<text x="1390.0" y="462" class="ttl">Alert sender</text>
+<text x="1390.0" y="479" class="sub">emails subscribers</text>
+<circle cx="1466" cy="416" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="1466" y="421" class="bdg">7</text>
+<rect x="271" y="631" width="168" height="98" rx="12" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/>
+<rect x="280" y="640" width="150" height="80" rx="8" fill="#fff" stroke="#8C4FFF" stroke-width="2"/>
+<rect x="280" y="640" width="150" height="22" rx="8" fill="#8C4FFF"/><rect x="280" y="652" width="150" height="10" fill="#8C4FFF"/>
+<text x="355.0" y="656" class="svc">API GATEWAY</text>
+<text x="355.0" y="682" class="ttl">Front door</text>
+<text x="355.0" y="699" class="sub">receives web requests</text>
+<circle cx="426" cy="636" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="426" y="641" class="bdg">A</text>
+<rect x="471" y="631" width="178" height="98" rx="12" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/>
+<rect x="480" y="640" width="160" height="80" rx="8" fill="#fff" stroke="#ED7100" stroke-width="2"/>
+<rect x="480" y="640" width="160" height="22" rx="8" fill="#ED7100"/><rect x="480" y="652" width="160" height="10" fill="#ED7100"/>
+<text x="560.0" y="656" class="svc">LAMBDA</text>
+<text x="560.0" y="682" class="ttl">Request handler</text>
+<text x="560.0" y="699" class="sub">looks up answers,</text>
+<text x="560.0" y="714" class="sub">starts jobs</text>
+<rect x="791" y="591" width="178" height="90" rx="12" fill="#FFF0A8" stroke="#D4A300" stroke-width="2"/>
+<rect x="800" y="600" width="160" height="72" rx="8" fill="#fff" stroke="#01A88D" stroke-width="2" stroke-dasharray="7 5"/>
+<rect x="800" y="600" width="160" height="22" rx="8" fill="#01A88D"/><rect x="800" y="612" width="160" height="10" fill="#01A88D"/>
+<text x="880.0" y="616" class="svc">SAGEMAKER (STRETCH)</text>
+<text x="880.0" y="642" class="ttl">Smarter detector</text>
+<text x="880.0" y="659" class="sub">learns from 6 months</text>
+<rect x="980" y="600" width="160" height="72" rx="8" fill="#fff" stroke="#B0084D" stroke-width="2"/>
+<rect x="980" y="600" width="160" height="22" rx="8" fill="#B0084D"/><rect x="980" y="612" width="160" height="10" fill="#B0084D"/>
+<text x="1060.0" y="616" class="svc">CLOUDWATCH</text>
+<text x="1060.0" y="642" class="ttl">Health monitor</text>
+<text x="1060.0" y="659" class="sub">logs from every part</text>
+<polyline points="430,220 478,220" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<polyline points="630,220 678,220" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="654" y="212" class="lbl" text-anchor="middle">add</text>
+<polyline points="830,220 878,220" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="854" y="212" class="lbl" text-anchor="middle">next</text>
+<polyline points="1230,224 1298,224" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="1264" y="216" class="lbl" text-anchor="middle">gaps</text>
+<polyline points="600,102 600,178" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="608" y="140" class="lbl" text-anchor="start">list files</text>
+<polyline points="930,102 930,178" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="938" y="140" class="lbl" text-anchor="start">download files</text>
+<polyline points="1380,102 1380,184" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="1388" y="140" class="lbl" text-anchor="start">daily map data</text>
+<polyline points="700,260 700,351 632,351" fill="none" stroke="#232F3E" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar)"/>
+<text x="694" y="300" class="lbl" text-anchor="end">after 3 tries</text>
+<polyline points="955,260 955,418" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="962" y="380" class="lbl" text-anchor="start">save data</text>
+<polyline points="1010,260 1010,300 1120,300 1120,418" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="1112" y="322" class="lbl" text-anchor="end">save counts per</text>
+<text x="1112" y="336" class="lbl" text-anchor="end">day and region</text>
+<polyline points="1215,418 1215,264" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)" marker-start="url(#arS)"/>
+<text x="1223" y="345" class="lbl" text-anchor="start">read counts /</text>
+<text x="1223" y="359" class="lbl" text-anchor="start">save results</text>
+<polyline points="1400,262 1400,313" fill="none" stroke="#232F3E" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar)"/>
+<polyline points="1400,381 1400,418" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="1394" y="405" class="tiny" text-anchor="end">if risk is high</text>
+<polyline points="230,680 278,680" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="254" y="672" class="lbl" text-anchor="middle">web</text>
+<polyline points="430,680 478,680" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<polyline points="620,640 620,560 760,560 760,262" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="768" y="470" class="lbl" text-anchor="start">B  re-check old dates</text>
+<text x="768" y="484" class="lbl" text-anchor="start">(adds tickets)</text>
+<polyline points="640,700 1175,700 1175,522" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="905" y="694" class="lbl" text-anchor="middle">look up regions, history, hotspots</text>
+<polyline points="560,720 560,785 1390,785 1390,502" fill="none" stroke="#232F3E" stroke-width="2" marker-end="url(#ar)"/>
+<text x="975" y="778" class="lbl" text-anchor="middle">sign up for email alerts</text>
+<circle cx="620" cy="600" r="12" fill="#232F3E" stroke="#fff" stroke-width="2"/><text x="620" y="605" class="bdg">B</text>
+</svg>

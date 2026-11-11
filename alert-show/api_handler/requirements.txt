@@ -1,0 +1,2 @@
+# boto3 is provided by the Lambda Python runtime.
+# Add third-party libraries here, then `sam build` installs them.

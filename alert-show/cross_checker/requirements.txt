@@ -1,0 +1,3 @@
+# boto3 is provided by the Lambda Python runtime.
+# Add third-party libraries here, then `sam build` installs them.
+# An H3 library belongs here (or in the image) when cell centroids are resolved.
