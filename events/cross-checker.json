@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-04",
+  "anomalies": [
+    {
+      "date": "2026-10-04",
+      "regionId": "baltic",
+      "provider": "planetiq",
+      "count": 35,
+      "expected": 251,
+      "ratio": 0.1394422310756972,
+      "z": -17.0,
+      "flagged": true
+    }
+  ],
+  "gpsjamOverlap": {"baltic": 0.42},
+  "streakDays": {"baltic#planetiq": 5}
+}

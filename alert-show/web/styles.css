@@ -1,0 +1,175 @@
+:root {
+  color: #1c2430;
+  background: #f4f6f8;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header,
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 20px;
+  background: #1b2838;
+  color: #f7f8fa;
+}
+
+header h1,
+aside h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+header p,
+#status,
+footer {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+#status {
+  max-width: 36rem;
+  text-align: right;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+#map {
+  flex: 1;
+  min-height: 420px;
+  background: #d5dde6;
+}
+
+aside {
+  width: 320px;
+  padding: 16px;
+  overflow: auto;
+  background: #fff;
+  border-left: 1px solid #d5dde6;
+}
+
+#region-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+#region-list button,
+form button {
+  font: inherit;
+  border: 1px solid #1b2838;
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+form button {
+  background: #1b2838;
+  color: #fff;
+  margin-top: 8px;
+}
+
+label {
+  display: block;
+  font-size: 0.9rem;
+}
+
+input[type="email"] {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+input[type="range"] {
+  width: 180px;
+  vertical-align: middle;
+}
+
+.legend span {
+  margin-left: 12px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+.swatch.low {
+  background: #2f9e44;
+}
+
+.swatch.mid {
+  background: #f08c00;
+}
+
+.swatch.high {
+  background: #e03131;
+}
+
+#detail-body p,
+#subscribe-result {
+  line-height: 1.4;
+}
+
+@media (max-width: 800px) {
+  body {
+    height: auto;
+  }
+
+  header,
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #status {
+    max-width: none;
+    text-align: left;
+  }
+
+  main {
+    display: block;
+    flex: none;
+  }
+
+  #map {
+    height: 52vh;
+    min-height: 280px;
+  }
+
+  aside {
+    width: auto;
+    overflow: visible;
+    border-left: 0;
+    border-top: 1px solid #d5dde6;
+  }
+}

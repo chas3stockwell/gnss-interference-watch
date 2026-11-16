@@ -1,0 +1,21 @@
+version = 0.1
+
+# Copy to samconfig.toml (gitignored) after `sam deploy --guided`, or edit the
+# region first. StubMode=1 deploys the skeleton without calling UCAR or GPSJam.
+
+[default.global.parameters]
+template_file = "infra/template.yaml"
+
+[default.build.parameters]
+template_file = "infra/template.yaml"
+
+[default.deploy.parameters]
+template_file = "infra/template.yaml"
+stack_name = "gnss-interference-watch"
+resolve_s3 = true
+s3_prefix = "gnss-interference-watch"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "StubMode=\"1\" AlertEmail=\"\""
+fail_on_empty_changeset = true

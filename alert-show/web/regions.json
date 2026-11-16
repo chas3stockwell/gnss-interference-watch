@@ -1,0 +1,42 @@
+[
+  {
+    "id": "baltic",
+    "name": "Baltic Sea",
+    "minLat": 53.0,
+    "maxLat": 66.0,
+    "minLon": 9.0,
+    "maxLon": 30.5,
+    "type": "hotspot",
+    "areaKm2": 1750204.0
+  },
+  {
+    "id": "black-sea",
+    "name": "Black Sea",
+    "minLat": 40.5,
+    "maxLat": 47.5,
+    "minLon": 27.0,
+    "maxLon": 42.0,
+    "type": "hotspot",
+    "areaKm2": 933304.2
+  },
+  {
+    "id": "north-atlantic",
+    "name": "North Atlantic (control)",
+    "minLat": 35.0,
+    "maxLat": 48.0,
+    "minLon": -45.0,
+    "maxLon": -20.0,
+    "type": "control",
+    "areaKm2": 3003153.2
+  },
+  {
+    "id": "north-pacific",
+    "name": "North Pacific (control)",
+    "minLat": 30.0,
+    "maxLat": 45.0,
+    "minLon": 150.0,
+    "maxLon": 175.0,
+    "type": "control",
+    "areaKm2": 3667979.5
+  }
+]

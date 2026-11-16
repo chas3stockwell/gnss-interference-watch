@@ -1,0 +1,8 @@
+# boto3 is provided by the Lambda Python runtime.
+#
+# Production decoding runs from the container image (Dockerfile), because
+# netCDF and BUFR libraries are large. When you implement the decoder, add
+# the packages to the image rather than to this zip-deployment file:
+#
+#   netCDF4
+#   pyarrow

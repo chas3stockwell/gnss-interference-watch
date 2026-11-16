@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GNSS Interference Watch</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>GNSS Interference Watch</h1>
+        <p>Radio-occultation gaps, cross-checked with airplane GPS reports.</p>
+      </div>
+      <p id="status" role="status">Loading regions…</p>
+    </header>
+    <main>
+      <div id="map" role="application" aria-label="Region map"></div>
+      <aside>
+        <h2>Region</h2>
+        <div id="region-list"></div>
+        <div id="detail-body">
+          <p>Choose a region. Color is the density ratio: green is near normal, red is a large drop.</p>
+        </div>
+        <form id="subscribe">
+          <h2>Email alerts</h2>
+          <label>
+            Email
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </label>
+          <button type="submit">Subscribe</button>
+          <p id="subscribe-result"></p>
+        </form>
+      </aside>
+    </main>
+    <footer>
+      <label>
+        October 2026
+        <input id="day" type="range" min="1" max="31" value="15" aria-valuemin="1" aria-valuemax="31" />
+        <span id="day-label">2026-10-15</span>
+      </label>
+      <div class="legend" aria-hidden="true">
+        <span><i class="swatch low"></i> ratio ≥ 0.8</span>
+        <span><i class="swatch mid"></i> 0.4–0.8</span>
+        <span><i class="swatch high"></i> ratio &lt; 0.4</span>
+      </div>
+    </footer>
+    <!-- Paste the ApiBaseUrl output here, with no trailing slash, to read live hotspots. -->
+    <script>
+      window.GNSSIW_API_BASE = "";
+    </script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="app.js"></script>
+  </body>
+</html>
